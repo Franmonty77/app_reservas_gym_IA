@@ -6,52 +6,37 @@ use Illuminate\Http\Request;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use App\Http\Requests\RegisterRequest;
 
 class AuthController extends Controller
 {
     //
 
-    public function register(Request $request){
+     public function register(RegisterRequest $request)
+    {
+        // Si la validación falla, Laravel devuelve 422 automáticamente
+        $data = $request->validated();
 
-
-        //1. Validar datos
-        $validacion=$request->validate([
-        'nombre'=>'required|string|max:120',
-        'apellidos'=>'nullable|string|max:160',
-        'email'=>'required|string|email|max:190|unique:users',
-        'telefono'=>'nullable|string|max:30',
-        'password'=>'required|string|min:6|'
+        $user = Usuario::create([
+            'nombre'        => $data['nombre'],
+            'apellidos'     => $data['apellidos'],
+            'email'         => $data['email'],
+            'telefono'      => $data['telefono'] ?? null,
+            'password_hash' => Hash::make($data['password']),
+            'rol'           => $data['rol'] ?? 'alumno',
+            'estado'        => $data['estado'] ?? 'activo',
         ]);
 
-        //2.Crear usuario
-        $usuario=Usuario::create([
-            'nombre'=>$validacion['nombre'],
-            'apellidos'=>$validacion['apellidos'] ?? null,
-            'email'=>$validacion['email'],
-            'telefono'=>$validacion['telefono'] ?? null,
-            'password_hash'=>Hash::make($validacion['password']),
-            'rol'=>'alumno',
-            'estado'=>'activo'
-        ]);
+        // Token (solo si tienes Sanctum)
+        $token = method_exists($user, 'createToken')
+            ? $user->createToken('api')->plainTextToken
+            : null;
 
-        //3.Respuesta
         return response()->json([
-            'message' => 'Usuario registrado correctamente',
-            'usuario' => [
-                'id'        => $usuario->id,
-                'nombre'    => $usuario->nombre,
-                'apellidos' => $usuario->apellidos,
-                'email'     => $usuario->email,
-                'telefono'  => $usuario->telefono,
-                'rol'       => $usuario->rol,
-                'estado'    => $usuario->estado,
-                'created_at'=> $usuario->created_at
-            ]
+            'message' => 'Usuario registrado correctamente.',
+            'user'    => $user,
+            'token'   => $token,
         ], 201);
-        
-
-        
-        
     }
 
 
