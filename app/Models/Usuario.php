@@ -4,34 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable; // Importante: para login/auth
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+
+
 
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, HasFactory;
+    use HasApiTokens, Notifiable;
 
-    protected $table = 'usuarios'; // nombre real de la tabla
+    protected $table = 'usuarios';
 
     protected $fillable = [
-        'nombre',
-        'apellidos',
-        'email',
-        'telefono',
-        'password_hash',
-        'rol',
-        'estado',
+        'nombre', 'apellidos', 'email', 'telefono', 'password_hash', 'rol', 'estado'
     ];
 
-    // Campos que no quieres que aparezcan en la respuesta JSON
-    protected $hidden = [
-        'password_hash',
-        'remember_token',
-    ];
+    protected $hidden = ['password_hash', 'remember_token'];
 
-    // Si necesitas casts
-    protected $casts = [
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-    ];
+    // 👇 Indicamos que el "password" real es `password_hash`
+    public function getAuthPassword()
+    {
+        return $this->password_hash;
+    }
 }
+
 

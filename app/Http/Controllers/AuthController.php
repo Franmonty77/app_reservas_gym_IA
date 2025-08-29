@@ -7,6 +7,9 @@ use App\Models\Usuario;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+
 
 class AuthController extends Controller
 {
@@ -40,49 +43,34 @@ class AuthController extends Controller
     }
 
 
-   public function login(Request $request)
+  public function login(LoginRequest $request)
 {
-    // 1) Validación
-    $credenciales = $request->validate([
-        'email'    => ['required','email'],
-        'password' => ['required','string']
-    ]);
+    $credentials = $request->only('email', 'password');
 
-    // Normaliza email por si viene con espacios o mayúsculas
-    $email = strtolower(trim($credenciales['email']));
-
-    // 2) Buscar usuario por email
-    $usuario = Usuario::where('email', $email)->first();
-
-    // 3) Verificar contraseña
-    if (!$usuario || !Hash::check($credenciales['password'], $usuario->password_hash)) {
-        return response()->json(['message' => 'Credenciales incorrectas'], 401);
+    if (!auth()->attempt($credentials)) {
+        return response()->json([
+            'message' => 'Credenciales incorrectas'
+        ], 401);
     }
 
+    /** @var \App\Models\Usuario $usuario */
+    $usuario = auth()->user();
 
-    // 4) Crear token (Sanctum)
     $token = $usuario->createToken('auth_token')->plainTextToken;
 
-    // 5) Respuesta
     return response()->json([
         'message' => 'Login correcto',
-        'token'   => $token,
-        'usuario' => [
-            'id'        => $usuario->id,
-            'nombre'    => $usuario->nombre,
-            'apellidos' => $usuario->apellidos,
-            'email'     => $usuario->email,
-            'rol'       => $usuario->rol,
-            'estado'    => $usuario->estado,
-        ]
-    ], 200);
+        'usuario' => $usuario,
+        'token' => $token,
+    ]);
 }
+
 
 
     public function logout(Request $request){
 
         //Borrar token actual
-        $request->user()->currentAccessToken()->delete();
+        $request->usuario()->currentAccessToken()->delete();
         return response()->json(['message'=>'Logout correcto'],200);
 
     }
