@@ -50,7 +50,7 @@ Route::get('/sesiones', [SesionController::class, 'index'])->name('sesiones.inde
 Route::post('/sesiones/filter', [SesionController::class, 'filter'])->name('sesiones.filter');
 Route::get('/sesiones/clear', [SesionController::class, 'clear'])->name('sesiones.clear');
 
-// Rutas para las reservas (web)
+// Rutas para las reservas (webs)
 Route::middleware('api.auth')->group(function() {
     Route::get('/reservas', [App\Http\Controllers\ReservaController::class, 'index'])->name('reservas.index');
     Route::get('/reservas/crear', [App\Http\Controllers\ReservaController::class, 'create'])->name('reservas.create');
