@@ -1,22 +1,46 @@
-/.phpunit.cache
+# Laravel
 /node_modules
-/public/build
 /public/hot
 /public/storage
 /storage/*.key
-/storage/framework/cache/*
-/storage/logs/*
-/boostrap/cache/*
 /vendor
 .env
 .env.backup
-.env.production
 .phpunit.result.cache
+docker-compose.override.yml
 Homestead.json
 Homestead.yaml
-auth.json
 npm-debug.log
 yarn-error.log
-/.fleet
 /.idea
 /.vscode
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+/storage/logs/*.log
+
+# Cache
+/bootstrap/cache/*.php
+/storage/framework/cache/data/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+
+# Compiled assets (if using Mix)
+/public/js/app.js
+/public/css/app.css
+/public/mix-manifest.json
+
+# IDE
+/.idea
+/.vscode
+*.swp
+*.swo
+
+# Temporary files
+*~
+.tmp
